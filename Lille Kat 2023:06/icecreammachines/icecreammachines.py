@@ -1,4 +1,5 @@
 # Solved in collaboration with Emil Dichmann
+# Achieves 52/100 points due to TLE on scoring groups 5-7
 
 n, _, k = map(int, input().split())
 customers = [int(input()) for _ in range(n)]

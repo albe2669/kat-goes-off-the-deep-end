@@ -8,8 +8,7 @@ import (
 	"strings"
 )
 
-// 28/88 accepted cases, should use a tree structure instead to store the prices and amounts.
-// Should pull the nodes from the tree when needing to update the prices, and reinsert them with new prices
+// 28/88 accepted cases, this is too slow
 
 var reader = bufio.NewReader(os.Stdin)
 var ws = bufio.NewWriter(os.Stdout)

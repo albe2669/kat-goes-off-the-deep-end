@@ -28,6 +28,19 @@ def answer(r, c):
     print(f"! {r} {c}", flush=True)
 
 
+def mirror(instructions):
+    mirrored = []
+    for s in instructions:
+        for ins in s:
+            if ins == LEFT:
+                mirrored.append(RIGHT)
+            elif ins == RIGHT:
+                mirrored.append(LEFT)
+            else:
+                mirrored.append(ins)
+    return mirrored
+
+
 LEFT, RIGHT, UP, DOWN = "<>^v"
 
 H, W = next_line()
@@ -86,8 +99,7 @@ def find_box(is_in_left_half):
     # invert lefts and rights if not left
     if not is_in_left_half:
         go_to_right = [RIGHT * W, DOWN, RIGHT * W, UP]
-        mirrored = [LEFT if x == RIGHT else RIGHT if x == LEFT else x for x in instructions]
-        instructions = go_to_right + mirrored
+        instructions = go_to_right + mirror(instructions)
 
     tr, tc = query(instructions)
 

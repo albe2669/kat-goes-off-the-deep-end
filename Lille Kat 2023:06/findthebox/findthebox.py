@@ -1,4 +1,4 @@
-from sys import stdin
+from sys import stdin, stderr
 from math import ceil
 
 
@@ -96,16 +96,20 @@ def find_box(case):
         tr, tc = query(instructions)
         return (tr + 1, tc)
 
-    instructions.extend(handle_first_row)
-
     # We KNOW the box is in a specific half, so we don't need to "bump into it"
     # if it's in the outermost column. As long as we make sure we never bump into
     # the opposite half's side wall, we can guarantee to arrive below the box in
     # the bottom row. Exception being if the box is in the bottom row.
-    s = W // 2 - 1 if case == CASE_LEFT_SIDE else W // 2
+    s = W // 2 - 1 if case == CASE_LEFT_SIDE or W % 2 == 0 else W // 2
 
+    # instructions.extend(handle_first_row)
+
+    steps_from_right = s - 1 if W % 2 == 0 else s - 2
+
+    # go to right corner
     if case == CASE_LEFT_SIDE:
-        instructions.append(RIGHT * w)
+        instructions.extend([RIGHT * W, DOWN, RIGHT * W, UP])
+    instructions.append(LEFT * steps_from_right)
 
     for _ in range(H):
         instructions.append(LEFT * s)
@@ -118,8 +122,7 @@ def find_box(case):
 
     # invert lefts and rights if not left
     if case == CASE_RIGHT_SIDE:
-        go_to_right = [RIGHT * W, DOWN, RIGHT * W, UP]
-        instructions = go_to_right + mirror(instructions)
+        instructions = mirror(instructions)
 
     tr, tc = query(instructions)
 
@@ -131,7 +134,10 @@ def find_box(case):
     return box_pos
 
 
-is_in_left_half = check_left_half()
-box_pos = find_box(is_in_left_half)
+case = check_left_half()
+
+print(["leftmost column", "right side", "left side"][case-1], file=stderr)
+
+box_pos = find_box(case)
 
 answer(*box_pos)

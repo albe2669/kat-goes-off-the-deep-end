@@ -1,4 +1,5 @@
-from sys import stdin
+from sys import stdin, stderr
+from math import ceil
 
 
 """
@@ -48,9 +49,16 @@ H, W = next_line()
 # todo: handle odd
 w = W // 2
 
-
 # Handle edge case of box in being in the first row
 handle_first_row = [DOWN, RIGHT * w, UP, LEFT * w, UP]
+
+
+# IDEA: you can figure out if its in the same column as the cleaner, if its in the left half, or if its in the columns to the right of the middle
+
+
+CASE_LEFT_HALF = 0
+CASE_RIGHT_HALF = 1
+CASE_MIDDLE = 2
 
 
 def check_left_half():
@@ -66,9 +74,17 @@ def check_left_half():
 
     tr, tc = query(instructions)
 
-    # If stop column is greater than w, then we hit the box going left in some row.
-    # If we didn't get to the bottom, the box must be in the w column
-    is_in_left = (tc > w) or (not tr < H - 1)
+    # if W % 2 == 1 and tr < H - 1:
+    #     return CASE_MIDDLE
+    #
+    # # If stop column is greater than w, then we hit the box going left in some row.
+    # # If we didn't get to the bottom, the box must be in the w column
+    # if (tc > w) or ((W % 2 == 0) and not tr < H - 1):
+    #     return CASE_RIGHT_HALF
+
+    is_in_left = (tc > w) or ((W % 2 == 0) and not tr < H - 1)
+
+    print(tc > w, tr < H - 1, file=stderr)
 
     return is_in_left
 
@@ -83,7 +99,7 @@ def find_box(is_in_left_half):
     # if it's in the outermost column. As long as we make sure we never bump into
     # the opposite half's side wall, we can guarantee to arrive below the box in
     # the bottom row. Exception being if the box is in the bottom row.
-    v = w - 1
+    v = w - 1 if W % 2 == 0 else w
 
     for _ in range(H):
         instructions.append(LEFT * v)

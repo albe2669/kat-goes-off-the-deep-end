@@ -1,19 +1,5 @@
-from sys import stdin, stderr
+from sys import stdin
 from math import ceil
-
-
-"""
-IDEA
-
-steps:
-- determine half:
-    - go W/2 right
-    - go down, W/2 left, W/2 right
-    - repeat until hitting bottom. If you are located on the right half, you know it was in the left half. If not, then it must be in the right half
-    - remember handling edge case of box being in the first row
-- then determine both column and row in a single query:
-    - use same strategy for column, but since we KNOW that the box is in that half, we will not end in the outermost column. therefore we can move one extra out in the final step and then try to go all the way up since the box must be in that column. we then must stop by hitting the box, revealing the row. if we reach the top, the row must have been the bottom row
-"""
 
 
 def next_line():
@@ -46,74 +32,77 @@ LEFT, RIGHT, UP, DOWN = "<>^v"
 
 H, W = next_line()
 
-# todo: handle odd
-w = W // 2
+w = ceil(W / 2)
 
 # Handle edge case of box in being in the first row
 handle_first_row = [DOWN, RIGHT * w, UP, LEFT * w, UP]
 
 
-# IDEA: you can figure out if its in the same column as the cleaner, if its in the left half, or if its in the columns to the right of the middle
-
-
-CASE_LEFT_HALF = 0
-CASE_RIGHT_HALF = 1
-CASE_MIDDLE = 2
+# Definition: "left side" includes middle column in odd-width rooms
+CASE_LEFTMOST_COLUMN = 1
+CASE_RIGHT_SIDE = 2
+CASE_LEFT_SIDE = 3
 
 
 def check_left_half():
     instructions = []
     instructions.extend(handle_first_row)
 
-    # Go to the right half and go down. Then all the way left again, go back out.
-    # If the box is in the left half, we will hit the box when going left in some row.
+    s = W // 2
+
+    # Go to the right side and go down. Then all the way left again, go back out.
+    # If the box is in the left side, we will hit the box when going left in some row.
     for _ in range(H):
-        instructions.append(LEFT * w)
-        instructions.append(RIGHT * w)
+        instructions.append(LEFT * s)
+        instructions.append(RIGHT * s)
         instructions.append(DOWN)
 
     tr, tc = query(instructions)
 
-    # if W % 2 == 1 and tr < H - 1:
-    #     return CASE_MIDDLE
-    #
-    # # If stop column is greater than w, then we hit the box going left in some row.
-    # # If we didn't get to the bottom, the box must be in the w column
-    # if (tc > w) or ((W % 2 == 0) and not tr < H - 1):
-    #     return CASE_RIGHT_HALF
+    if tr == H - 1 and tc == s:
+        return CASE_RIGHT_SIDE
 
-    is_in_left = (tc > w) or ((W % 2 == 0) and not tr < H - 1)
+    if tc == s + 1:
+        return CASE_LEFTMOST_COLUMN
 
-    print(tc > w, tr < H - 1, file=stderr)
+    return CASE_LEFT_SIDE
 
-    return is_in_left
 
-def find_box(is_in_left_half):
+def find_box(case):
     instructions = []
+
+    if case == CASE_LEFTMOST_COLUMN:
+        instructions.append(DOWN * H)
+        tr, tc = query(instructions)
+        return (tr + 1, tc)
+
     instructions.extend(handle_first_row)
 
-    instructions.append(LEFT * w)
-    instructions.append(RIGHT * w)
+    # instructions.append(LEFT * w)
+    # instructions.append(RIGHT * w)
 
     # We KNOW the box is in a specific half, so we don't need to "bump into it"
     # if it's in the outermost column. As long as we make sure we never bump into
     # the opposite half's side wall, we can guarantee to arrive below the box in
     # the bottom row. Exception being if the box is in the bottom row.
-    v = w - 1 if W % 2 == 0 else w
+    s = W // 2 - 1 if case == CASE_LEFT_SIDE else W // 2
+
+    if case == CASE_LEFT_SIDE:
+        instructions.append(RIGHT * w)
 
     for _ in range(H):
-        instructions.append(LEFT * v)
-        instructions.append(RIGHT * v)
+        instructions.append(LEFT * s)
+        instructions.append(RIGHT * s)
         instructions.append(DOWN)
 
     # also handle for the odd-width case...
 
-    instructions.append(LEFT * v)
+    instructions.append(LEFT * s)
     instructions.append(LEFT)
     instructions.append(UP * H)
 
     # invert lefts and rights if not left
-    if not is_in_left_half:
+    if case == CASE_RIGHT_SIDE:
         go_to_right = [RIGHT * W, DOWN, RIGHT * W, UP]
         instructions = go_to_right + mirror(instructions)
 
@@ -122,7 +111,7 @@ def find_box(is_in_left_half):
     if tr != 0:
         box_pos = (tr - 1, tc)
     else:
-        box_pos = (H - 1, tc - 1)
+        box_pos = (H - 1, tc + 1 if case == CASE_RIGHT_SIDE else tc - 1)
 
     return box_pos
 

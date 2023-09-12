@@ -1,10 +1,11 @@
-H, W = 6, 8
-query = """
-? v >>>> ^ <<<< ^ <<<< >>>> <<< >>> v <<< >>> v <<< >>> v <<< >>> v <<< >>> v <<< >>> v <<< < ^^^^^^
-"""
+H, W = 4, 5
+
+print(H, W)
+
+query = input()
 query = query.replace("?", "").replace(" ", "").strip()
 
-box = (0, 3)
+box = (3, 2)
 
 print(query)
 
@@ -14,6 +15,7 @@ pos = (0, 0)
 grid[pos[0]][pos[1]] = "#"
 
 def pp():
+    # return
     for i in range(H):
         for j in range(W):
             x = grid[i][j]
@@ -43,4 +45,4 @@ for d in query:
 
     pp()
 
-print(pos)
+print(*pos)

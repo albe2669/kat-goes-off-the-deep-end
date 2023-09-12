@@ -32,6 +32,21 @@ LEFT, RIGHT, UP, DOWN = "<>^v"
 
 H, W = next_line()
 
+
+
+# Straight-forward for single-row case
+if H == 1:
+    tr, tc = query([RIGHT * W])
+    answer(0, tc + 1)
+    exit(0)
+
+# Straight-forward for single-column case
+if W == 1:
+    tr, tc = query([DOWN * W])
+    answer(tr + 1, 0)
+    exit(0)
+
+
 w = ceil(W / 2)
 
 # Handle edge case of box in being in the first row
@@ -59,11 +74,16 @@ def check_left_half():
 
     tr, tc = query(instructions)
 
-    if tr == H - 1 and tc == s:
-        return CASE_RIGHT_SIDE
-
     if tc == s + 1:
         return CASE_LEFTMOST_COLUMN
+
+    # only for even width cases
+    if W % 2 == 0 and tc == s:
+        return CASE_RIGHT_SIDE
+
+    # only for odd width cases
+    if W % 2 == 1 and (tr == H - 1 and tc == s):
+        return CASE_RIGHT_SIDE
 
     return CASE_LEFT_SIDE
 
@@ -78,9 +98,6 @@ def find_box(case):
 
     instructions.extend(handle_first_row)
 
-    # instructions.append(LEFT * w)
-    # instructions.append(RIGHT * w)
-
     # We KNOW the box is in a specific half, so we don't need to "bump into it"
     # if it's in the outermost column. As long as we make sure we never bump into
     # the opposite half's side wall, we can guarantee to arrive below the box in
@@ -94,8 +111,6 @@ def find_box(case):
         instructions.append(LEFT * s)
         instructions.append(RIGHT * s)
         instructions.append(DOWN)
-
-    # also handle for the odd-width case...
 
     instructions.append(LEFT * s)
     instructions.append(LEFT)

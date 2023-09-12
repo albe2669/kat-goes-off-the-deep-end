@@ -1,13 +1,20 @@
-H, W = 4, 5
+"""
+Usage: python3 simulator.py "5 6" "0 3" wait
+                             H W   box  ^ wait for enter at each step
+"""
+import sys
 
-print(H, W)
+_, dims, box_pos, *argv = sys.argv
+
+H, W = map(int, dims.split())
+box = tuple(map(int, box_pos.split()))
+
+# print(H, W, flush=True)
 
 query = input()
 query = query.replace("?", "").replace(" ", "").strip()
 
-box = (3, 2)
-
-print(query)
+print(query, file=sys.stderr)
 
 grid = [["." for _ in range(W)] for _ in range(H)]
 
@@ -23,9 +30,10 @@ def pp():
                 x = "B"
             if (i, j) == pos:
                 x = "O"
-            print(x, end="")
-        print()
-    input()
+            print(x, end="", file=sys.stderr)
+        print(file=sys.stderr)
+    if argv and argv[0] == "wait":
+        input()
 
 pp()
 
@@ -35,7 +43,7 @@ for d in query:
     dr, dc = dirs[d]
     tr, tc = pos[0] + dr, pos[1] + dc
 
-    print(d)
+    print(d, file=sys.stderr)
 
     if (tr, tc) == box or tr < 0 or tr >= H or tc < 0 or tc >= W:
         continue
@@ -45,4 +53,4 @@ for d in query:
 
     pp()
 
-print(*pos)
+print(*pos, flush=True)

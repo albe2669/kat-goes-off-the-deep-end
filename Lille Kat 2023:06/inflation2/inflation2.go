@@ -4,7 +4,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -44,19 +43,19 @@ func main() {
 			y = readInt64From(tokens[2])
 
 			if x != y {
-				if _, ok := table[x-globalInflation]; !ok {
+				if table[x-globalInflation] == 0 {
 					goto printSum
 				}
 
 				table[y-globalInflation] += table[x-globalInflation]
 
 				sum += (y - x) * table[x-globalInflation]
-				delete(table, x-globalInflation)
-
+				table[x-globalInflation] = 0
+				// delete(table, x-globalInflation)
 			}
 		}
 	printSum:
-		ws.WriteString(fmt.Sprint(sum) + "\n")
+		ws.WriteString(strconv.FormatInt(sum, 10) + "\n")
 	}
 
 	ws.Flush()

@@ -42,8 +42,19 @@ if H == 1:
 
 # Straight-forward for single-column case
 if W == 1:
-    tr, tc = query([DOWN * W])
+    tr, tc = query([DOWN * H])
     answer(tr + 1, 0)
+    exit(0)
+elif W == 2:
+    tr, tc = query([DOWN * H])
+    if tr == H - 1:
+        tr, tc = query([RIGHT, DOWN * H])
+        if tc == 0:
+            answer(0, 1)
+        else:
+            answer(tr + 1, 1)
+    else:
+        answer(tr + 1, 0)
     exit(0)
 
 
@@ -74,7 +85,7 @@ def check_left_half():
 
     tr, tc = query(instructions)
 
-    if tc == s + 1:
+    if tc == s + 1 and W > 4:
         return CASE_LEFTMOST_COLUMN
 
     # only for even width cases
@@ -104,12 +115,10 @@ def find_box(case):
 
     # instructions.extend(handle_first_row)
 
-    steps_from_right = s - 1 if W % 2 == 0 else s - 2
-
     # go to right corner
     if case == CASE_LEFT_SIDE:
         instructions.extend([RIGHT * W, DOWN, RIGHT * W, UP])
-    instructions.append(LEFT * steps_from_right)
+    instructions.append(LEFT * s)
 
     for _ in range(H):
         instructions.append(LEFT * s)
